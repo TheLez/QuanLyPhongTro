@@ -133,11 +133,15 @@ public class Advertisements {
 		this.user = user;
 	}
 
-	public Integer getType() { return type; }
+	public Integer getType() {
+		return type;
+	}
 
-	public void setType(Integer type) { this.type = type; }
+	public void setType(Integer type) {
+		this.type = type;
+	}
 
-    // Getters and Setters
+	// Getters and Setters
     
 }
 

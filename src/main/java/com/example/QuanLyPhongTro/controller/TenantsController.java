@@ -17,11 +17,13 @@ public class TenantsController {
     @Autowired
     private TenantsService _tenantsService;
 
-    @GetMapping("")
+    // Lấy tất cả người thuê
+    @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
     public List<Tenants> getAllTenants() {
         return _tenantsService.getAllTenants();
     }
 
+    // Lấy người thuê theo ID
     @GetMapping("/{id}")
     public ResponseEntity<Tenants> getTenantById(@PathVariable int id) {
         Tenants tenant = _tenantsService.getTenantById(id);
@@ -31,18 +33,21 @@ public class TenantsController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    // Lấy danh sách người thuê với phân trang
+    @GetMapping("")  // Giữ nguyên để trả về danh sách người thuê với phân trang
     public Page<Tenants> getTenants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _tenantsService.getTenants(page, size);
     }
 
+    // Thêm người thuê mới
     @PostMapping("")
     public Tenants addTenant(@RequestBody Tenants tenant) {
         return _tenantsService.addTenant(tenant);
     }
 
+    // Cập nhật người thuê theo ID
     @PutMapping("/{id}")
     public ResponseEntity<Tenants> updateTenant(@PathVariable int id, @RequestBody Tenants tenantDetails) {
         Tenants updatedTenant = _tenantsService.updateTenant(id, tenantDetails);
@@ -52,6 +57,7 @@ public class TenantsController {
         return ResponseEntity.notFound().build();
     }
 
+    // Xóa người thuê theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTenant(@PathVariable int id) {
         if (_tenantsService.deleteTenant(id)) {

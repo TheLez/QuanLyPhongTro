@@ -15,28 +15,33 @@ public class AdminsController {
     @Autowired
     private AdminsService _adminsService;
 
-    @GetMapping("")
+    // Phương thức để lấy tất cả admin
+    @GetMapping("/all")
     public List<Admins> getAllAdmins() {
         return _adminsService.getAllAdmins();
     }
 
-    @GetMapping
+    // Phương thức để phân trang admin
+    @GetMapping("")
     public Page<Admins> getAdmins(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _adminsService.getAdmins(page, size);
     }
 
+    // Phương thức để tìm admin theo ID
     @GetMapping("/{id}")
-    public Admins findById() {
-        return _adminsService.getAdminById(1);
+    public Admins findById(@PathVariable int id) {
+        return _adminsService.getAdminById(id);
     }
 
+    // Phương thức để thêm admin mới
     @PostMapping("")
     public Admins addAdmin(@RequestBody Admins admin) {
         return _adminsService.addAdmin(admin);
     }
 
+    // Phương thức để cập nhật thông tin admin
     @PutMapping("/{id}")
     public ResponseEntity<Admins> updateAdmin(@PathVariable int id, @RequestBody Admins adminDetails) {
         Admins updatedAdmin = _adminsService.updateAdmin(id, adminDetails);
@@ -46,6 +51,7 @@ public class AdminsController {
         return ResponseEntity.notFound().build();
     }
 
+    // Phương thức để xóa admin
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAdmin(@PathVariable int id) {
         if (_adminsService.deleteAdmin(id)) {

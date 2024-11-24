@@ -17,11 +17,13 @@ public class SupportRequestsController {
     @Autowired
     private SupportRequestsService _supportRequestsService;
 
-    @GetMapping("")
+    // Lấy tất cả các yêu cầu hỗ trợ
+    @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
     public List<SupportRequests> getAllSupportRequests() {
         return _supportRequestsService.getAllSupportRequests();
     }
 
+    // Lấy yêu cầu hỗ trợ theo ID
     @GetMapping("/{id}")
     public ResponseEntity<SupportRequests> getSupportRequestById(@PathVariable int id) {
         SupportRequests supportRequest = _supportRequestsService.getSupportRequestById(id);
@@ -31,18 +33,21 @@ public class SupportRequestsController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    // Lấy danh sách yêu cầu hỗ trợ với phân trang
+    @GetMapping("")  // Giữ nguyên để trả về danh sách yêu cầu hỗ trợ với phân trang
     public Page<SupportRequests> getSupportRequests(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _supportRequestsService.getSupportRequests(page, size);
     }
 
+    // Thêm yêu cầu hỗ trợ mới
     @PostMapping("")
     public SupportRequests addSupportRequest(@RequestBody SupportRequests supportRequest) {
         return _supportRequestsService.addSupportRequest(supportRequest);
     }
 
+    // Cập nhật yêu cầu hỗ trợ theo ID
     @PutMapping("/{id}")
     public ResponseEntity<SupportRequests> updateSupportRequest(@PathVariable int id, @RequestBody SupportRequests supportRequestDetails) {
         SupportRequests updatedSupportRequest = _supportRequestsService.updateSupportRequest(id, supportRequestDetails);
@@ -52,6 +57,7 @@ public class SupportRequestsController {
         return ResponseEntity.notFound().build();
     }
 
+    // Xóa yêu cầu hỗ trợ theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSupportRequest(@PathVariable int id) {
         if (_supportRequestsService.deleteSupportRequest(id)) {

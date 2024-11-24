@@ -44,7 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new CustomUserDetails(user);
         }
 
-        Admins admin = adminRepository.findById(userId).orElse(null); // Nếu bạn cần kiểm tra Admin
+        Admins admin = adminRepository.findById(userId).orElse(null);
         if (admin != null) {
             return new CustomUserDetails(admin);
         }
