@@ -1,6 +1,7 @@
 package com.example.QuanLyPhongTro.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,13 @@ public class ServicePackagesController {
             return ResponseEntity.ok(servicePackage);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping
+    public Page<ServicePackages> getServicePackages(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return _servicePackagesService.getServicePackages(page, size);
     }
 
     @PostMapping("")

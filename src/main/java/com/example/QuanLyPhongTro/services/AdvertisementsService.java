@@ -1,6 +1,9 @@
 package com.example.QuanLyPhongTro.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.Advertisements;
@@ -21,6 +24,11 @@ public class AdvertisementsService {
         return _advertisementsRepository.findById(id).orElse(null);
     }
 
+    public Page<Advertisements> getAdvertisements(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return _advertisementsRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
     public Advertisements addAdvertisement(Advertisements advertisement) {
         return _advertisementsRepository.save(advertisement);
     }
@@ -39,6 +47,7 @@ public class AdvertisementsService {
             advertisement.setLatitude(advertisementDetails.getLatitude());
             advertisement.setLongitude(advertisementDetails.getLongitude());
             advertisement.setUser(advertisementDetails.getUser());
+            advertisement.setType(advertisementDetails.getType());
             return _advertisementsRepository.save(advertisement);
         }
         return null;

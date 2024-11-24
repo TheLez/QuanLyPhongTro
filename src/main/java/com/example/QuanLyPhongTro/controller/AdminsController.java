@@ -3,6 +3,7 @@ package com.example.QuanLyPhongTro.controller;
 import com.example.QuanLyPhongTro.models.Admins;
 import com.example.QuanLyPhongTro.services.AdminsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,13 @@ public class AdminsController {
     @GetMapping("")
     public List<Admins> getAllAdmins() {
         return _adminsService.getAllAdmins();
+    }
+
+    @GetMapping
+    public Page<Admins> getAdmins(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return _adminsService.getAdmins(page, size);
     }
 
     @GetMapping("/{id}")

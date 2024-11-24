@@ -1,6 +1,9 @@
 package com.example.QuanLyPhongTro.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.AdvertisementImages;
@@ -19,6 +22,12 @@ public class AdvertisementImagesService {
 
     public AdvertisementImages getImageById(int id) {
         return _advertisementImagesRepository.findById(id).orElse(null);
+    }
+
+    public Page<AdvertisementImages> getAdvertisementImages(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        // Gọi phương thức để lấy hình ảnh theo thứ tự giảm dần
+        return _advertisementImagesRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     public AdvertisementImages addImage(AdvertisementImages image) {

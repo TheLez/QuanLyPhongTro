@@ -1,6 +1,9 @@
 package com.example.QuanLyPhongTro.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.Admins;
@@ -18,6 +21,11 @@ public class AdminsService {
 
 	public List<Admins> getAllAdmins() {
 		return _adminsRepository.findAll();
+	}
+
+	public Page<Admins> getAdmins(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return _adminsRepository.findAll(pageable);
 	}
 
 	public Admins addAdmin(Admins admin) {
