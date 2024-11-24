@@ -31,6 +31,8 @@ public class Advertisements {
 
     private Double longitude;
 
+	private Integer type;
+
     @ManyToOne
     @JoinColumn(name = "id_user")
     private Users user;
@@ -130,6 +132,10 @@ public class Advertisements {
 	public void setUser(Users user) {
 		this.user = user;
 	}
+
+	public Integer getType() { return type; }
+
+	public void setType(Integer type) { this.type = type; }
 
     // Getters and Setters
     

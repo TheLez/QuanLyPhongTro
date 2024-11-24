@@ -1,38 +1,43 @@
-package com.example.QuanLyPhongTro;
+package com.example.QuanLyPhongTro.controller;
 
 import com.example.QuanLyPhongTro.models.Admins;
+import com.example.QuanLyPhongTro.services.AdminsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.example.QuanLyPhongTro.services.AdminsService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/hello")
-public class HelloController {
+@RequestMapping("/admins")
+public class AdminsController {
+    @Autowired
+    private AdminsService _adminsService;
 
-	@Autowired
-	private AdminsService _adminsService;
-
-    @GetMapping("/getall")
+    @GetMapping("")
     public List<Admins> getAllAdmins() {
         return _adminsService.getAllAdmins();
     }
 
-    @GetMapping("/find/{id}")
-    public String sayHello() {
-        return _adminsService.getAdminById(1).getUsername();
+    @GetMapping
+    public Page<Admins> getAdmins(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return _adminsService.getAdmins(page, size);
     }
 
-    @PostMapping("/add")
+    @GetMapping("/{id}")
+    public Admins findById() {
+        return _adminsService.getAdminById(1);
+    }
+
+    @PostMapping("")
     public Admins addAdmin(@RequestBody Admins admin) {
         return _adminsService.addAdmin(admin);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Admins> updateAdmin(@PathVariable int id, @RequestBody Admins adminDetails) {
         Admins updatedAdmin = _adminsService.updateAdmin(id, adminDetails);
         if (updatedAdmin != null) {
