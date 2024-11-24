@@ -17,11 +17,13 @@ public class ServicePackagesController {
     @Autowired
     private ServicePackagesService _servicePackagesService;
 
-    @GetMapping("")
+    // Lấy tất cả gói dịch vụ
+    @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
     public List<ServicePackages> getAllServicePackages() {
         return _servicePackagesService.getAllServicePackages();
     }
 
+    // Lấy gói dịch vụ theo ID
     @GetMapping("/{id}")
     public ResponseEntity<ServicePackages> getServicePackageById(@PathVariable int id) {
         ServicePackages servicePackage = _servicePackagesService.getServicePackageById(id);
@@ -31,18 +33,21 @@ public class ServicePackagesController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    // Lấy danh sách gói dịch vụ với phân trang
+    @GetMapping("")  // Giữ nguyên để trả về danh sách gói dịch vụ với phân trang
     public Page<ServicePackages> getServicePackages(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _servicePackagesService.getServicePackages(page, size);
     }
 
+    // Thêm gói dịch vụ mới
     @PostMapping("")
     public ServicePackages addServicePackage(@RequestBody ServicePackages servicePackage) {
         return _servicePackagesService.addServicePackage(servicePackage);
     }
 
+    // Cập nhật gói dịch vụ theo ID
     @PutMapping("/{id}")
     public ResponseEntity<ServicePackages> updateServicePackage(@PathVariable int id, @RequestBody ServicePackages servicePackageDetails) {
         ServicePackages updatedServicePackage = _servicePackagesService.updateServicePackage(id, servicePackageDetails);
@@ -52,6 +57,7 @@ public class ServicePackagesController {
         return ResponseEntity.notFound().build();
     }
 
+    // Xóa gói dịch vụ theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteServicePackage(@PathVariable int id) {
         if (_servicePackagesService.deleteServicePackage(id)) {

@@ -27,7 +27,7 @@ public class AdvertisementImagesService {
     public Page<AdvertisementImages> getAdvertisementImages(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         // Gọi phương thức để lấy hình ảnh theo thứ tự giảm dần
-        return _advertisementImagesRepository.findAllByOrderByCreatedAtDesc(pageable);
+        return _advertisementImagesRepository.findAll(pageable);
     }
 
     public AdvertisementImages addImage(AdvertisementImages image) {

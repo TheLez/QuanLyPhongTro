@@ -17,11 +17,13 @@ public class UsersController {
     @Autowired
     private UsersService _usersService;
 
-    @GetMapping("")
+    // Lấy tất cả người dùng
+    @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
     public List<Users> getAllUsers() {
         return _usersService.getAllUsers();
     }
 
+    // Lấy người dùng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable int id) {
         Users user = _usersService.getUserById(id);
@@ -31,18 +33,21 @@ public class UsersController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    // Lấy danh sách người dùng với phân trang
+    @GetMapping("")  // Giữ nguyên để trả về danh sách người dùng với phân trang
     public Page<Users> getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _usersService.getUsers(page, size);
     }
 
+    // Thêm người dùng mới
     @PostMapping("")
     public Users addUser(@RequestBody Users user) {
         return _usersService.addUser(user);
     }
 
+    // Cập nhật người dùng theo ID
     @PutMapping("/{id}")
     public ResponseEntity<Users> updateUser(@PathVariable int id, @RequestBody Users userDetails) {
         Users updatedUser = _usersService.updateUser(id, userDetails);
@@ -52,6 +57,7 @@ public class UsersController {
         return ResponseEntity.notFound().build();
     }
 
+    // Xóa người dùng theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         if (_usersService.deleteUser(id)) {

@@ -17,11 +17,13 @@ public class RoomServicesController {
     @Autowired
     private RoomServicesService _roomServicesService;
 
-    @GetMapping("")
+    // Lấy tất cả dịch vụ phòng
+    @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
     public List<RoomServices> getAllRoomServices() {
         return _roomServicesService.getAllRoomServices();
     }
 
+    // Lấy dịch vụ phòng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<RoomServices> getRoomServiceById(@PathVariable int id) {
         RoomServices roomService = _roomServicesService.getRoomServiceById(id);
@@ -31,18 +33,21 @@ public class RoomServicesController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    // Lấy dịch vụ phòng với phân trang
+    @GetMapping("")  // Giữ nguyên để trả về danh sách dịch vụ phòng với phân trang
     public Page<RoomServices> getRoomServices(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return _roomServicesService.getRoomServices(page, size);
     }
 
+    // Thêm dịch vụ phòng mới
     @PostMapping("")
     public RoomServices addRoomService(@RequestBody RoomServices roomService) {
         return _roomServicesService.addRoomService(roomService);
     }
 
+    // Cập nhật dịch vụ phòng theo ID
     @PutMapping("/{id}")
     public ResponseEntity<RoomServices> updateRoomService(@PathVariable int id, @RequestBody RoomServices roomServiceDetails) {
         RoomServices updatedRoomService = _roomServicesService.updateRoomService(id, roomServiceDetails);
@@ -52,6 +57,7 @@ public class RoomServicesController {
         return ResponseEntity.notFound().build();
     }
 
+    // Xóa dịch vụ phòng theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoomService(@PathVariable int id) {
         if (_roomServicesService.deleteRoomService(id)) {
