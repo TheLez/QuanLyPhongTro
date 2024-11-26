@@ -1,15 +1,19 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.example.QuanLyPhongTro.dto.AdvertisementDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.Advertisements;
 import com.example.QuanLyPhongTro.repositories.AdvertisementsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import jakarta. persistence. criteria. Predicate;
 
 @Service
 public class AdvertisementsService {
@@ -24,9 +28,38 @@ public class AdvertisementsService {
         return _advertisementsRepository.findById(id).orElse(null);
     }
 
-    public Page<Advertisements> getAdvertisements(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return _advertisementsRepository.findAllByOrderByCreatedAtDesc(pageable);
+    public Page<AdvertisementDTO> getAdvertisements(String address, Integer priceMin, Integer priceMax, Integer areaMin, Integer areaMax, PageRequest pageRequest) {
+
+        // Sử dụng Specification để tạo query động
+        Specification<Advertisements> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>(
+
+            );
+
+            if (address != null && !address.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("address"), "%" + address + "%"));
+            }
+            if (priceMin != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("cost"), priceMin));
+            }
+            if (priceMax != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("cost"), priceMax));
+            }
+            if (areaMin != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("area"), areaMin));
+            }
+            if (areaMax != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("area"), areaMax));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // Trả về kết quả phân trang
+        Page<Advertisements> advertisementsPage = _advertisementsRepository.findAll(spec, pageRequest);
+
+        // Chuyển đối tượng Advertisement thành AdvertisementDTO
+        return advertisementsPage.map(advertisement -> new AdvertisementDTO(advertisement));
     }
 
     public Advertisements addAdvertisement(Advertisements advertisement) {

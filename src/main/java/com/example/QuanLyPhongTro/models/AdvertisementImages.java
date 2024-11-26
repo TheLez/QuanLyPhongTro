@@ -1,4 +1,6 @@
 package com.example.QuanLyPhongTro.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,10 +11,12 @@ public class AdvertisementImages {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+	@JsonProperty("image_path")
     private String imagePath;
 
     @ManyToOne
     @JoinColumn(name = "id_ad")
+	@JsonIgnore
     private Advertisements advertisement;
 
 	public Integer getId() {

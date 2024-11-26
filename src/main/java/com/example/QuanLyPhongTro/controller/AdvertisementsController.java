@@ -1,7 +1,11 @@
 package com.example.QuanLyPhongTro.controller;
 
+import com.example.QuanLyPhongTro.dto.AdvertisementDTO;
+import com.example.QuanLyPhongTro.dto.AdvertisementDetailDTO;
+import com.example.QuanLyPhongTro.dto.PageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,21 +28,31 @@ public class AdvertisementsController {
     }
 
     // Lấy quảng cáo theo ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Advertisements> getAdvertisementById(@PathVariable int id) {
+    @GetMapping("/get/{id}")
+    public ResponseEntity<AdvertisementDetailDTO> getAdvertisementById(@PathVariable int id) {
         Advertisements advertisement = _advertisementsService.getAdvertisementById(id);
         if (advertisement != null) {
-            return ResponseEntity.ok(advertisement);
+            AdvertisementDetailDTO advertisementDetailDTO = new AdvertisementDetailDTO(advertisement);
+            return ResponseEntity.ok(advertisementDetailDTO);
         }
         return ResponseEntity.notFound().build();
     }
 
     // Lấy quảng cáo với phân trang
-    @GetMapping("")  // Giữ nguyên để trả về danh sách quảng cáo với phân trang
-    public Page<Advertisements> getAdvertisements(
+    @GetMapping ("/get") // Giữ nguyên để trả về danh sách quảng cáo với phân trang
+    public ResponseEntity<PageDTO<AdvertisementDTO>> getAdvertisements(
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Integer priceMin,
+            @RequestParam(required = false) Integer priceMax,
+            @RequestParam(required = false) Integer areaMin,
+            @RequestParam(required = false) Integer areaMax,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return _advertisementsService.getAdvertisements(page, size);
+        // Gọi service với các tham số lọc
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<AdvertisementDTO> advertisements = _advertisementsService.getAdvertisements(address, priceMin, priceMax, areaMin, areaMax, pageRequest);
+
+        return ResponseEntity.ok(new PageDTO<AdvertisementDTO>(advertisements));
     }
 
     // Thêm quảng cáo mới

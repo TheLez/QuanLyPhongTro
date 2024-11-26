@@ -1,6 +1,7 @@
 package com.example.QuanLyPhongTro.models;
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "Advertisements")
@@ -36,6 +37,9 @@ public class Advertisements {
     @ManyToOne
     @JoinColumn(name = "id_user")
     private Users user;
+
+	@OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<AdvertisementImages> advertisementImages;
 
 	public Integer getId() {
 		return id;
@@ -139,6 +143,14 @@ public class Advertisements {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Set<AdvertisementImages> getAdvertisementImages() {
+		return advertisementImages;
+	}
+
+	public void setAdvertisementImages(Set<AdvertisementImages> advertisementImages) {
+		this.advertisementImages = advertisementImages;
 	}
 
 	// Getters and Setters

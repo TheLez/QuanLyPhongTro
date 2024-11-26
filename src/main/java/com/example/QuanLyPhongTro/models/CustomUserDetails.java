@@ -27,7 +27,15 @@ public class CustomUserDetails implements UserDetails {
         return null;
     }
 
-    @Override
+    public Object getUser() {
+		return user;
+	}
+
+	public void setUser(Object user) {
+		this.user = user;
+	}
+
+	@Override
     public String getPassword() {
         if (user instanceof Users) {
             return ((Users) user).getPassword();
