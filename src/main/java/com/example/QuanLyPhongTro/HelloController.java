@@ -16,6 +16,13 @@ public class HelloController {
 
 	@Autowired
 	private AdminsService _adminsService;
+//    @GetMapping("/getall")
+//    public List<Admins> getAllAdmins() {
+//        List<Admins> admins = _adminsService.getAllAdmins();
+//        System.out.println("Fetched all admins: " + admins);
+//        return admins;
+//    }
+
 
     @GetMapping("/getall")
     public List<Admins> getAllAdmins() {

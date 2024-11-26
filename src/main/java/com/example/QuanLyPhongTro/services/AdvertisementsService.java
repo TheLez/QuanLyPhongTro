@@ -1,15 +1,18 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.example.QuanLyPhongTro.Specification.AdvertisementsSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.Advertisements;
 import com.example.QuanLyPhongTro.repositories.AdvertisementsRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AdvertisementsService {
@@ -60,4 +63,8 @@ public class AdvertisementsService {
         }
         return false;
     }
+    // Phương thức tìm kiếm với các tiêu chí linh hoạt
+    public List<Advertisements> searchAdvertisements(Map<String, String> params) {
+        Specification<Advertisements> specification = AdvertisementsSpecification.getAdvertisements(params);
+        return _advertisementsRepository.findAll(specification); }
 }

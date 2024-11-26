@@ -1,4 +1,5 @@
 package com.example.QuanLyPhongTro.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -26,16 +27,20 @@ public class Users {
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 
+	@JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_service")
     private ServicePackages servicePackage;
 
+	@JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Advertisements> advertisements;
 
+	@JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<SupportRequests> supportRequests;
 
+	@JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Houses> houses;
 

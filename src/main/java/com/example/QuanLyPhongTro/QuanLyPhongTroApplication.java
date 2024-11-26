@@ -24,10 +24,10 @@ public class QuanLyPhongTroApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//Users user = new Users();
-		//user.setUsername("LeTuanLmao");
-		//user.setPassword(passwordEncoder.encode("123"));
-		//userRepository.save(user);
-		//System.out.println(user);
+//		Users user = new Users();
+//		user.setUsername("doanvietanh");
+//		user.setPassword(passwordEncoder.encode("123"));
+//		userRepository.save(user);
+//		System.out.println(user);
 	}
 }

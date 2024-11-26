@@ -2,6 +2,7 @@ package com.example.QuanLyPhongTro.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import com.example.QuanLyPhongTro.models.Advertisements;
 import com.example.QuanLyPhongTro.services.AdvertisementsService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/advertisements")
@@ -64,5 +66,10 @@ public class AdvertisementsController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    @GetMapping("/search")
+    public ResponseEntity<List<Advertisements>> searchAdvertisements(@RequestParam Map<String, String> params){
+        List<Advertisements> advertisementsList = _advertisementsService.searchAdvertisements(params);
+        return new ResponseEntity<>(advertisementsList, HttpStatus.OK);
     }
 }
