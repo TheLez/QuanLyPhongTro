@@ -1,6 +1,11 @@
 package com.example.QuanLyPhongTro.models;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Set;
 
@@ -8,40 +13,50 @@ import java.util.Set;
 @Table(name = "Users")
 public class Users {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    private String username;
+	@NotBlank(message = "Tên người dùng không được để trống")
+	@Size(min = 3, max = 50, message = "Tên người dùng phải có từ 3 đến 50 ký tự")
+	private String username;
 
-    private String password;
+	@NotBlank(message = "Mật khẩu không được để trống")
+	@Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
+	private String password;
 
-    private String email;
+	@NotBlank(message = "Email không được để trống")
+	@Email(message = "Email không hợp lệ")
+	private String email;
 
-    private String phoneNumber;
+	@NotBlank(message = "Số điện thoại không được để trống")
+	@Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "Số điện thoại không hợp lệ") // Thay đổi regex nếu cần
+	private String phoneNumber;
 
-    private String fullName;
+	private String fullName;
 
-    private Integer status;
+	private Integer status;
 
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
+	@Temporal(TemporalType.DATE)
+	private Date createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "id_service")
-    private ServicePackages servicePackage;
+	@ManyToOne
+	@JoinColumn(name = "id_service")
+	private ServicePackages servicePackage;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
-    private Set<Advertisements> advertisements;
+	private Set<Advertisements> advertisements;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
-    private Set<SupportRequests> supportRequests;
+	private Set<SupportRequests> supportRequests;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
-    private Set<Houses> houses;
+	private Set<Houses> houses;
+
+	// Getters and Setters...
 
 	public Integer getId() {
 		return id;
@@ -138,8 +153,4 @@ public class Users {
 	public void setHouses(Set<Houses> houses) {
 		this.houses = houses;
 	}
-
-    // Getters and Setters
-    
 }
-

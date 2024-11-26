@@ -51,4 +51,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         throw new UsernameNotFoundException("User not found with id: " + userId);
     }
+
+    public CustomUserDetails loadUserById(int userId, String role) {
+        if ("ROLE_USER".equalsIgnoreCase(role)) {
+            Users user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                return new CustomUserDetails(user);
+            }
+        } else if ("ROLE_ADMIN".equalsIgnoreCase(role)) {
+            Admins admin = adminRepository.findById(userId).orElse(null);
+            if (admin != null) {
+                return new CustomUserDetails(admin);
+            }
+        }
+
+        throw new UsernameNotFoundException("User not found with id: " + userId + " and role: " + role);
+    }
 }

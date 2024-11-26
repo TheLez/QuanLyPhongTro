@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -37,7 +38,7 @@ public class AdminsController {
 
     // Phương thức để thêm admin mới
     @PostMapping("")
-    public Admins addAdmin(@RequestBody Admins admin) {
+    public Admins addAdmin(@Valid @RequestBody Admins admin) {
         return _adminsService.addAdmin(admin);
     }
 

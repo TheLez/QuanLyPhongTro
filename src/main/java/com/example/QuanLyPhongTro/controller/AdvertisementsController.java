@@ -6,6 +6,7 @@ import com.example.QuanLyPhongTro.dto.PageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import com.example.QuanLyPhongTro.models.Advertisements;
 import com.example.QuanLyPhongTro.services.AdvertisementsService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/advertisements")

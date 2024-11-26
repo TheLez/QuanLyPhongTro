@@ -13,9 +13,13 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
     private Object user; // Có thể là User hoặc Admin
+
+    public CustomUserDetails(Object user) {
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

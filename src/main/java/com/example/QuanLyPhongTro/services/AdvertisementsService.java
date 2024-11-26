@@ -13,6 +13,9 @@ import com.example.QuanLyPhongTro.repositories.AdvertisementsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import jakarta. persistence. criteria. Predicate;
 
 @Service

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.QuanLyPhongTro.models.Users;
 import com.example.QuanLyPhongTro.services.UsersService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -43,7 +44,7 @@ public class UsersController {
 
     // Thêm người dùng mới
     @PostMapping("")
-    public Users addUser(@RequestBody Users user) {
+    public Users addUser(@Valid @RequestBody Users user) {
         return _usersService.addUser(user);
     }
 

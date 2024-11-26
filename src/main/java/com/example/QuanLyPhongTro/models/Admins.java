@@ -1,21 +1,28 @@
 package com.example.QuanLyPhongTro.models;
+
 import jakarta.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
 @Table(name = "Admins")
 public class Admins {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    private String username;
+	@NotBlank(message = "Tên người dùng không được để trống")
+	@Size(min = 3, max = 50, message = "Tên người dùng phải có từ 3 đến 50 ký tự")
+	private String username;
 
-    private String password;
+	@NotBlank(message = "Mật khẩu không được để trống")
+	@Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
+	private String password;
 
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
+	@Temporal(TemporalType.DATE)
+	private Date createdAt;
 
 	public Integer getId() {
 		return id;
@@ -48,8 +55,4 @@ public class Admins {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-
-    // Getters and Setters
-    
 }
-

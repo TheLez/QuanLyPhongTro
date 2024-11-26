@@ -19,11 +19,13 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtTokenProvider tokenProvider;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response, FilterChain filterChain)
@@ -35,19 +37,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 // Lấy id user từ chuỗi jwt
                 int userId = tokenProvider.getUserIdFromJWT(jwt);
+                // Lấy role từ chuỗi jwt
+                String role = tokenProvider.getRoleFromToken(jwt);
+
                 // Lấy thông tin người dùng từ id
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                if(userDetails != null) {
-                    // Nếu người dùng hợp lệ, set thông tin cho Seturity Context
-                    UsernamePasswordAuthenticationToken
-                            authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UserDetails userDetails = customUserDetailsService.loadUserById(userId, role);
+
+                if (userDetails != null) {
+                    // Nếu người dùng hợp lệ, set thông tin cho Security Context
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("User {} with role {} is authenticated", userDetails.getUsername(), role);
+                } else {
+                    log.warn("User not found for ID: {}", userId);
                 }
+            } else {
+                log.warn("JWT is invalid or missing");
             }
         } catch (Exception ex) {
-//            log.error("failed on set user authentication", ex);
+            log.error("Failed to set user authentication", ex);
         }
 
         filterChain.doFilter(request, response);
@@ -62,4 +73,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
-
