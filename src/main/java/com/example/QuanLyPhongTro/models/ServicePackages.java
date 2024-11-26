@@ -1,4 +1,5 @@
 package com.example.QuanLyPhongTro.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class ServicePackages {
 
     private Double price;
 
+	@JsonIgnore
     @OneToMany(mappedBy = "servicePackage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Users> users;
 

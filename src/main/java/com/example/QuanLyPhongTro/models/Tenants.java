@@ -1,4 +1,6 @@
 package com.example.QuanLyPhongTro.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,9 +19,16 @@ public class Tenants {
 
     private Integer isRepresentative;
 
+	@JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_room")
-    private Rooms room;
+	private Rooms room;
+
+	@JsonProperty("id_room")
+	public Integer getIdUser() {
+		return room != null ? room.getId() : null;
+	}
+
 
 	public Integer getId() {
 		return id;

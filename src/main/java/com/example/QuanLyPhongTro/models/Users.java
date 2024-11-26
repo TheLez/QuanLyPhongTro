@@ -1,6 +1,9 @@
 package com.example.QuanLyPhongTro.models;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -8,41 +11,48 @@ import java.util.Set;
 @Table(name = "Users")
 public class Users {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    private String username;
+	private String username;
 
-    private String password;
+	private String password;
 
-    private String email;
+	private String email;
 
-    private String phoneNumber;
+	private String phoneNumber;
 
-    private String fullName;
+	private String fullName;
 
-    private Integer status;
+	private Integer status;
 
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
-
-	@JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "id_service")
-    private ServicePackages servicePackage;
+	@Temporal(TemporalType.DATE)
+	private Date createdAt;
 
 	@JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Advertisements> advertisements;
+	@ManyToOne
+	@JoinColumn(name = "id_service")
+	private ServicePackages servicePackage;
+
+	@JsonProperty("id_service")
+	public Integer getIdUser() {
+		return servicePackage != null ? servicePackage.getId() : null;
+	}
 
 	@JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<SupportRequests> supportRequests;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Advertisements> advertisements;
 
 	@JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Houses> houses;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<SupportRequests> supportRequests;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Houses> houses;
+
+	// Getters and Setters
 
 	public Integer getId() {
 		return id;
@@ -139,8 +149,4 @@ public class Users {
 	public void setHouses(Set<Houses> houses) {
 		this.houses = houses;
 	}
-
-    // Getters and Setters
-    
 }
-

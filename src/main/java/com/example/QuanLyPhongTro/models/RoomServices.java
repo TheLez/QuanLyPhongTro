@@ -1,4 +1,6 @@
 package com.example.QuanLyPhongTro.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -19,9 +21,15 @@ public class RoomServices {
 
     private Integer unit;
 
+	@JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_room")
     private Rooms room;
+
+	@JsonProperty("id_room")
+	public Integer getIdUser() {
+		return room != null ? room.getId() : null;
+	}
 
 	public Integer getId() {
 		return id;

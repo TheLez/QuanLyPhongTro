@@ -1,41 +1,53 @@
 package com.example.QuanLyPhongTro.models;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity
 @Table(name = "Advertisements")
 public class Advertisements {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    private String description;
+	private String description;
 
-    private Integer status;
+	private Integer status;
 
-    private String address;
+	private String address;
 
-    private Double cost;
+	private Double cost;
 
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
+	@Temporal(TemporalType.DATE)
+	private Date createdAt;
 
-    private Integer maxOccupants;
+	private Integer maxOccupants;
 
-    private String title;
+	private String title;
 
-    private Integer area;
+	private Integer area;
 
-    private Double latitude;
+	private Double latitude;
 
-    private Double longitude;
+	private Double longitude;
 
 	private Integer type;
 
-    @ManyToOne
-    @JoinColumn(name = "id_user")
-    private Users user;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "id_user")
+	private Users user;
+
+	@JsonProperty("id_user")
+	public Integer getIdUser() {
+		return user != null ? user.getId() : null;
+	}
+
+	// Getters and Setters
 
 	public Integer getId() {
 		return id;
@@ -140,8 +152,4 @@ public class Advertisements {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-
-	// Getters and Setters
-    
 }
-

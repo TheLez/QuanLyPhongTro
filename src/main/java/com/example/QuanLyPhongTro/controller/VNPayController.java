@@ -25,7 +25,6 @@ public class VNPayController {
         //nhập cái giá gói dịch vụ vào request
         long amount = Integer.parseInt(req.getParameter("amount"))*100;
         //nhập ngân hàng muốn chuyển vào requyest
-        String bankCode = req.getParameter("bankCode");
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = VNPayConfig.getIpAddress(req);
 
