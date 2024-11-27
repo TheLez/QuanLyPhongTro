@@ -9,6 +9,7 @@ import com.example.QuanLyPhongTro.payload.LoginResponse;
 import com.example.QuanLyPhongTro.payload.RandomStuff;
 import com.example.QuanLyPhongTro.payload.RegisterRequest;
 import com.example.QuanLyPhongTro.repositories.UsersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class WebRestController {
@@ -43,7 +45,6 @@ public class WebRestController {
 
     @PostMapping("/login")
     public LoginResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         // Xác thực từ username và password.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -61,35 +62,35 @@ public class WebRestController {
         return new LoginResponse(jwt);
     }
 
-    @PostMapping("/register")
-    public String registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        // Kiểm tra xem tên người dùng đã tồn tại hay chưa
-        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
-            return "Tên người dùng đã tồn tại!";
-        }
-
-        // Kiểm tra thông tin thanh toán
-        if (registerRequest.getPaymentInfo() == null || !registerRequest.getPaymentInfo().isSuccessful()) {
-            return "Thanh toán không thành công!";
-        }
-
-        // Xác thực ID giao dịch
-        String transactionId = registerRequest.getPaymentInfo().getTransactionId();
-        if (!verifyVNPayTransaction(transactionId)) {
-            return "Thanh toán không thành công!";
-        }
-
-        // Tạo mới người dùng
-        Users user = new Users();
-        user.setUsername(registerRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setEmail(registerRequest.getEmail());
-        user.setPhoneNumber(registerRequest.getPhoneNumber());
-
-        // Lưu người dùng vào database
-        userRepository.save(user);
-        return "Đăng ký thành công!";
-    }
+//    @PostMapping("/register")
+//    public String registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+//        // Kiểm tra xem tên người dùng đã tồn tại hay chưa
+//        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
+//            return "Tên người dùng đã tồn tại!";
+//        }
+//
+//        // Kiểm tra thông tin thanh toán
+//        if (registerRequest.getPaymentInfo() == null || !registerRequest.getPaymentInfo().isSuccessful()) {
+//            return "Thanh toán không thành công!";
+//        }
+//
+//        // Xác thực ID giao dịch
+//        String transactionId = registerRequest.getPaymentInfo().getTransactionId();
+//        if (!verifyVNPayTransaction(transactionId)) {
+//            return "Thanh toán không thành công!";
+//        }
+//
+//        // Tạo mới người dùng
+//        Users user = new Users();
+//        user.setUsername(registerRequest.getUsername());
+//        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+//        user.setEmail(registerRequest.getEmail());
+//        user.setPhoneNumber(registerRequest.getPhoneNumber());
+//
+//        // Lưu người dùng vào database
+//        userRepository.save(user);
+//        return "Đăng ký thành công!";
+//    }
 
     public boolean verifyVNPayTransaction(String transactionId) {
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;

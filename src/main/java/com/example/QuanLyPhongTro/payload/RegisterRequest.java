@@ -9,11 +9,39 @@ public class RegisterRequest {
     @NotBlank
     private String password;
 
+    private String fullName;
+
     private String email;
 
     private String phoneNumber;
 
-    private PaymentInfo paymentInfo;
+    private int idService;
+
+    private Double price;
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setIdService(int idService) {
+        this.idService = idService;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public int getIdService() {
+        return idService;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
 
     public String getUsername() {
         return username;
@@ -47,13 +75,6 @@ public class RegisterRequest {
         this.phoneNumber = phoneNumber;
     }
 
-    public PaymentInfo getPaymentInfo() {
-        return paymentInfo;
-    }
-
-    public void setPaymentInfo(PaymentInfo paymentInfo) {
-        this.paymentInfo = paymentInfo;
-    }
 
 
     // Getter và Setter

@@ -3,14 +3,20 @@ package com.example.QuanLyPhongTro.controller;
 import com.example.QuanLyPhongTro.dto.PaymentRestDTO;
 import com.example.QuanLyPhongTro.dto.TransactionStatusDTO;
 import com.example.QuanLyPhongTro.config.VNPayConfig;
+import com.example.QuanLyPhongTro.models.ServicePackages;
+import com.example.QuanLyPhongTro.models.Users;
+import com.example.QuanLyPhongTro.payload.RegisterRequest;
+import com.example.QuanLyPhongTro.repositories.ServicePackagesRepository;
+import com.example.QuanLyPhongTro.repositories.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -20,11 +26,20 @@ import java.util.*;
 @RestController
 @RequestMapping("/payment")
 public class VNPayController {
-    @GetMapping("/create_payment")
-    public ResponseEntity<?> createPayment(HttpServletRequest req) throws UnsupportedEncodingException {
+    @Autowired
+    private UsersRepository _userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private ServicePackagesRepository _servicePackagesRepository;
+
+    @PostMapping("/create_payment")
+    public ResponseEntity<?> createPayment(HttpServletRequest req,@RequestBody RegisterRequest request) throws UnsupportedEncodingException {
+        System.out.println(request.getPrice()+"aaa");
         //nhập cái giá gói dịch vụ vào request
-        long amount = Integer.parseInt(req.getParameter("amount"))*100;
-        //nhập ngân hàng muốn chuyển vào requyest
+        long amount =(long)(request.getPrice()*100);
+        //nhập ngân hàng muốn chuyển vào request
         String bankCode = req.getParameter("bankCode");
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = VNPayConfig.getIpAddress(req);
@@ -37,12 +52,12 @@ public class VNPayController {
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(amount));
         vnp_Params.put("vnp_CurrCode", "VND");
-//        vnp_Params.put("vnp_BankCode", "NCB");
+        vnp_Params.put("vnp_BankCode", "NCB");
         if (bankCode != null && !bankCode.isEmpty()) {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", Base64.getEncoder().encodeToString((request.getUsername()+"|"+request.getPassword()+"|"+request.getFullName()+"|"+request.getEmail()+"|"+request.getPhoneNumber()+"|"+request.getIdService()).getBytes()));
         vnp_Params.put("vnp_OrderType", VNPayConfig.orderType);
         String locate = req.getParameter("language");
         if (locate != null && !locate.isEmpty()) {
@@ -106,11 +121,12 @@ public class VNPayController {
     @GetMapping("/payment_infor")
     public ResponseEntity<?> transaction(
             HttpServletRequest request,
+            HttpServletResponse response,
 //            @RequestParam(value = "vnp_Amount") String amount,
 //            @RequestParam(value = "vnp_BankCode") String bankcode,
-//            @RequestParam(value = "vnp_OrderInfo") String order,
+            @RequestParam(value = "vnp_OrderInfo") String order,
             @RequestParam(value = "vnp_ResponseCode") String responseCode
-    ){
+    ) throws IOException {
         Map<String, String> params = new HashMap<>();
         Enumeration<String> parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()){
@@ -124,15 +140,38 @@ public class VNPayController {
 //        response.put("message", "Successfully");
 //        response.put("data", params);
         TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
+        String orderInfo = new String(Base64.getDecoder().decode(order));
+        String[] userInfo = orderInfo.split("\\|");
+        String userName = userInfo[0];
+        String password = userInfo[1];
+        String fullName = userInfo[2];
+        String email = userInfo[3];
+        String phoneNumber = userInfo[4];
+        int idService = Integer.parseInt(userInfo[5]);
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername(userName);
+        registerRequest.setPassword(password);
+        registerRequest.setFullName(fullName);
+        registerRequest.setEmail(email);
+        registerRequest.setPhoneNumber(phoneNumber);
+        registerRequest.setIdService(idService);
         if (responseCode.equals("00")){
-            transactionStatusDTO.setStatus("Ok");
-            transactionStatusDTO.setMessage("Successfully");
-            transactionStatusDTO.setData(params);
+            Users user = new Users();
+            user.setUsername(registerRequest.getUsername());
+            user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+            user.setFullName(registerRequest.getFullName());
+            user.setEmail(registerRequest.getEmail());
+            user.setPhoneNumber(registerRequest.getPhoneNumber());
+            ServicePackages sv = _servicePackagesRepository.findById(idService).orElse(null);
+            user.setServicePackage(sv);
+            _userRepository.save(user);
+            response.sendRedirect("http://localhost:3000");
         }else{
             transactionStatusDTO.setStatus("No");
             transactionStatusDTO.setMessage("Failed");
             transactionStatusDTO.setData("");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(transactionStatusDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
