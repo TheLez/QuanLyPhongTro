@@ -19,6 +19,8 @@ public class Invoices {
     @JoinColumn(name = "id_room")
     private Rooms room;
 
+	private Integer status;
+
 	public Integer getId() {
 		return id;
 	}
@@ -49,6 +51,14 @@ public class Invoices {
 
 	public void setRoom(Rooms room) {
 		this.room = room;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
     // Getters and Setters
