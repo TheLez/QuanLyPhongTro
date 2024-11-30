@@ -24,14 +24,17 @@ public class JwtTokenProvider {
 
         int userId;
         String role;
+        String fullName;
 
         // Lấy ID và role từ user
         if (userDetails.getUser() instanceof Users) {
             userId = ((Users) userDetails.getUser()).getId();
             role = "ROLE_USER"; // Hoặc lấy từ cơ sở dữ liệu
+            fullName=((Users) userDetails.getUser()).getFullName();
         } else if (userDetails.getUser() instanceof Admins) {
             userId = ((Admins) userDetails.getUser()).getId();
             role = "ROLE_ADMIN"; // Hoặc lấy từ cơ sở dữ liệu
+            fullName="Admin";
         } else {
             throw new IllegalArgumentException("User type is not supported");
         }
@@ -39,7 +42,8 @@ public class JwtTokenProvider {
         // Tạo JWT với claims bao gồm ID và role
         return Jwts.builder()
                 .setSubject(Long.toString(userId))
-                .claim("role", role) // Thêm role vào claims
+                .claim("role", role)
+                .claim("fullName",fullName)// Thêm role vào claims
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(JWT_SECRET)

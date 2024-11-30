@@ -166,11 +166,9 @@ public class VNPayController {
             ServicePackages sv = _servicePackagesRepository.findById(idService).orElse(null);
             user.setServicePackage(sv);
             _userRepository.save(user);
-            response.sendRedirect("http://localhost:3000");
+            response.sendRedirect("http://localhost:3000/successful");
         }else{
-            transactionStatusDTO.setStatus("No");
-            transactionStatusDTO.setMessage("Failed");
-            transactionStatusDTO.setData("");
+            response.sendRedirect("http://localhost:3000/failure");
         }
         return ResponseEntity.status(HttpStatus.OK).build();
     }
