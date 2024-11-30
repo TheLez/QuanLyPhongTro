@@ -1,5 +1,6 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.example.QuanLyPhongTro.models.Rooms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.QuanLyPhongTro.models.Invoices;
 import com.example.QuanLyPhongTro.repositories.InvoicesRepository;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -50,5 +52,18 @@ public class InvoicesService {
             return true;
         }
         return false;
+    }
+
+    public Invoices createInvoice(Double total, Rooms room) {
+        Invoices invoice = new Invoices();
+        invoice.setTotal(total); // Thiết lập tổng tiền
+        invoice.setCreatedAt(new Date()); // Thiết lập thời gian tạo
+        invoice.setRoom(room); // Thiết lập phòng liên quan
+        invoice.setStatus(0); // 0: chưa thanh toán
+        return _invoicesRepository.save(invoice); // Lưu hóa đơn vào cơ sở dữ liệu
+    }
+
+    public void updateInvoice(Invoices invoice) {
+        _invoicesRepository.save(invoice);
     }
 }

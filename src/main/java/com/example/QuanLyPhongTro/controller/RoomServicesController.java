@@ -65,4 +65,13 @@ public class RoomServicesController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<List<RoomServices>> getRoomServicesByRoomId(@PathVariable int roomId) {
+        List<RoomServices> roomServices = _roomServicesService.getRoomServicesByRoomId(roomId);
+        if (roomServices.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Trả về 204 nếu không có dịch vụ nào
+        }
+        return ResponseEntity.ok(roomServices);
+    }
 }

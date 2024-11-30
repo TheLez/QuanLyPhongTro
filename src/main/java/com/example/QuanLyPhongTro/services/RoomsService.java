@@ -55,4 +55,8 @@ public class RoomsService {
         }
         return false;
     }
+
+    public List<Rooms> getRoomsByHouseId(int houseId) {
+        return _roomsRepository.findByHouseId(houseId);
+    }
 }
