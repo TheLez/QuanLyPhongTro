@@ -46,7 +46,7 @@ public class AdvertisementsController {
             @PathVariable Integer id,
             @RequestParam(required = false) Integer status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "5") int size) {
         // Gọi service với các tham số lọc
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<AdvertisementDTO> advertisements = _advertisementsService.getAdvertisementsByUser(id,status,pageRequest);
@@ -57,7 +57,7 @@ public class AdvertisementsController {
     @GetMapping("/admin/get")
     public ResponseEntity<PageDTO<AdvertisementDTO>> getAdvertisementsByAdmin(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "5") int size) {
         // Gọi service với các tham số lọc
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<AdvertisementDTO> advertisements = _advertisementsService.getAdvertisementsByAmin(pageRequest);
@@ -83,13 +83,13 @@ public class AdvertisementsController {
     }
 
     // Thêm quảng cáo mới
-    @PostMapping("")
+    @PostMapping("/create")
     public Advertisements addAdvertisement(@RequestBody Advertisements advertisement) {
         return _advertisementsService.addAdvertisement(advertisement);
     }
 
     // Cập nhật quảng cáo theo ID
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Advertisements> updateAdvertisement(@PathVariable int id, @RequestBody Advertisements advertisementDetails) {
         Advertisements updatedAdvertisement = _advertisementsService.updateAdvertisement(id, advertisementDetails);
         if (updatedAdvertisement != null) {
@@ -99,7 +99,7 @@ public class AdvertisementsController {
     }
 
     // Xóa quảng cáo theo ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAdvertisement(@PathVariable int id) {
         if (_advertisementsService.deleteAdvertisement(id)) {
             return ResponseEntity.noContent().build();
