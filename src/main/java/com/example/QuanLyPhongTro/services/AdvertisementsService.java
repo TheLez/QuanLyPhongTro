@@ -39,6 +39,8 @@ public class AdvertisementsService {
 
             );
 
+            predicates.add(criteriaBuilder.equal(root.get("status"), 1));
+
             if (address != null && !address.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("address"), "%" + address + "%"));
             }
@@ -96,4 +98,49 @@ public class AdvertisementsService {
         }
         return false;
     }
+
+    public Page<AdvertisementDTO> getAdvertisementsByUser(Integer id,Integer status,PageRequest pageRequest){
+        Specification<Advertisements> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>(
+
+            );
+
+            if (id != null) {
+                predicates.add(criteriaBuilder.equal(root.get("user").get("id"), id));
+            }
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+    // Trả về kết quả phân trang
+    Page<Advertisements> advertisementsPage = _advertisementsRepository.findAll(spec, pageRequest);
+
+    // Chuyển đối tượng Advertisement thành AdvertisementDTO
+        return advertisementsPage.map(advertisement -> new AdvertisementDTO(advertisement));
+    };
+
+    public Page<AdvertisementDTO> getAdvertisementsByAmin(PageRequest pageRequest){
+        Specification<Advertisements> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>(
+
+            );
+
+
+                predicates.add(criteriaBuilder.equal(root.get("status"), 0));
+
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        // Trả về kết quả phân trang
+        Page<Advertisements> advertisementsPage = _advertisementsRepository.findAll(spec, pageRequest);
+
+        // Chuyển đối tượng Advertisement thành AdvertisementDTO
+        return advertisementsPage.map(advertisement -> new AdvertisementDTO(advertisement));
+    }
+
+
+
 }

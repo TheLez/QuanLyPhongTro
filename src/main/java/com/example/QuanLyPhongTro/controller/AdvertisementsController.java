@@ -40,6 +40,31 @@ public class AdvertisementsController {
         return ResponseEntity.notFound().build();
     }
 
+
+    @GetMapping("/user/get/{id}")
+    public ResponseEntity<PageDTO<AdvertisementDTO>> getAdvertisementsByUserId(
+            @PathVariable Integer id,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        // Gọi service với các tham số lọc
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<AdvertisementDTO> advertisements = _advertisementsService.getAdvertisementsByUser(id,status,pageRequest);
+
+        return ResponseEntity.ok(new PageDTO<AdvertisementDTO>(advertisements));
+    }
+
+    @GetMapping("/admin/get")
+    public ResponseEntity<PageDTO<AdvertisementDTO>> getAdvertisementsByAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        // Gọi service với các tham số lọc
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<AdvertisementDTO> advertisements = _advertisementsService.getAdvertisementsByAmin(pageRequest);
+
+        return ResponseEntity.ok(new PageDTO<AdvertisementDTO>(advertisements));
+    }
+
     // Lấy quảng cáo với phân trang
     @GetMapping ("/get") // Giữ nguyên để trả về danh sách quảng cáo với phân trang
     public ResponseEntity<PageDTO<AdvertisementDTO>> getAdvertisements(
