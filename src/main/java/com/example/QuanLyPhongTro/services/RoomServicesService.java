@@ -53,4 +53,8 @@ public class RoomServicesService {
         }
         return false;
     }
+
+    public List<RoomServices> getRoomServicesByRoomId(int roomId) {
+        return _roomServicesRepository.findByRoomId(roomId);
+    }
 }
