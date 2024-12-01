@@ -65,4 +65,10 @@ public class TenantsController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<List<Tenants>> getTenantsByRoomId(@PathVariable int roomId) {
+        List<Tenants> tenants = _tenantsService.getTenantsByRoomId(roomId);
+        return ResponseEntity.ok(tenants);
+    }
 }
