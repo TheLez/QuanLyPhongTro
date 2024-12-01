@@ -52,4 +52,19 @@ public class SupportRequestsService {
         }
         return false;
     }
+    // Lấy tất cả request chưa reply
+    public List<SupportRequests> getPendingRequests() {
+        return _supportRequestsRepository.findByStatus(0); // 0: Pending
+    }
+
+    // Admin trả lời request
+    public SupportRequests replyToRequest(int id, String replyContent) {
+        SupportRequests request = _supportRequestsRepository.findById(id).orElse(null);
+        if (request != null && request.getStatus() == 0) { // Chỉ reply nếu chưa được trả lời
+            request.setAdminReply(replyContent);
+            request.setStatus(1); // Cập nhật trạng thái thành Replied
+            return _supportRequestsRepository.save(request);
+        }
+        return null; // Không tìm thấy hoặc request đã được trả lời
+    }
 }

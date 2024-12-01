@@ -65,4 +65,25 @@ public class SupportRequestsController {
         }
         return ResponseEntity.notFound().build();
     }
+    //Phuc test
+    // Lấy danh sách request chưa được trả lời (cho admin)
+    @GetMapping("/pending")
+    public List<SupportRequests> getPendingRequests() {
+        return _supportRequestsService.getPendingRequests();
+    }
+
+    // Admin trả lời request
+    @PostMapping("/{id}/reply")
+    public SupportRequests replyToRequest(@PathVariable int id, @RequestBody String replyContent) {
+        return _supportRequestsService.replyToRequest(id, replyContent);
+    }
+
+    // User lấy tất cả các request của họ
+    @GetMapping("/user/{userId}")
+    public List<SupportRequests> getUserRequests(@PathVariable int userId) {
+        return _supportRequestsService.getAllSupportRequests() // Hoặc thêm filter ở đây
+                .stream()
+                .filter(request -> request.getUser().getId() == userId)
+                .toList();
+    }
 }
