@@ -1,5 +1,7 @@
 package com.example.QuanLyPhongTro.controller;
 
+import com.example.QuanLyPhongTro.models.Advertisements;
+import com.example.QuanLyPhongTro.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class UsersController {
 
     @Autowired
     private UsersService _usersService;
+    @Autowired
+    private UsersRepository _usersRepository;
 
     // Lấy tất cả người dùng
     @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
@@ -63,6 +67,17 @@ public class UsersController {
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         if (_usersService.deleteUser(id)) {
             return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<Users> changeUserStatus(@PathVariable int id, @RequestBody Users user) {
+        Users updateUser = _usersRepository.findById(id).orElse(null);
+        if (updateUser != null) {
+            updateUser.setStatus(user.getStatus());
+            _usersRepository.save(updateUser);
+            return ResponseEntity.ok(user);
         }
         return ResponseEntity.notFound().build();
     }

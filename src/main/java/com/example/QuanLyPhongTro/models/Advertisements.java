@@ -155,6 +155,7 @@ public class Advertisements {
 	}
 
 	// Getters and Setters
+
     
 }
 

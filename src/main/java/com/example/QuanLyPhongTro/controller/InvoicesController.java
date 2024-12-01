@@ -30,7 +30,7 @@ public class InvoicesController {
     @Autowired
     private RoomsService _roomsService;
 
-    @Autowired
+    @Autowired(required = false)
     private EmailService emailService;
 
     // Lấy tất cả hóa đơn

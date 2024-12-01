@@ -3,6 +3,7 @@ package com.example.QuanLyPhongTro.controller;
 import com.example.QuanLyPhongTro.dto.AdvertisementDTO;
 import com.example.QuanLyPhongTro.dto.AdvertisementDetailDTO;
 import com.example.QuanLyPhongTro.dto.PageDTO;
+import com.example.QuanLyPhongTro.repositories.AdvertisementsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,9 @@ public class AdvertisementsController {
 
     @Autowired
     private AdvertisementsService _advertisementsService;
+
+    @Autowired
+    private AdvertisementsRepository _advertisementsRepository;
 
     // Lấy tất cả quảng cáo
     @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
@@ -106,4 +110,16 @@ public class AdvertisementsController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/approve/{id}")
+    public ResponseEntity<Advertisements> approveAdvertisement(@PathVariable int id, @RequestBody Advertisements advertisementDetails) {
+        Advertisements updatedAdvertisement = _advertisementsRepository.findById(id).orElse(null);
+        if (updatedAdvertisement != null) {
+            updatedAdvertisement.setStatus(advertisementDetails.getStatus());
+            _advertisementsRepository.save(updatedAdvertisement);
+            return ResponseEntity.ok(updatedAdvertisement);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 }
