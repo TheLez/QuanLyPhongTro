@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -165,6 +166,11 @@ public class VNPayController {
             user.setPhoneNumber(registerRequest.getPhoneNumber());
             ServicePackages sv = _servicePackagesRepository.findById(idService).orElse(null);
             user.setServicePackage(sv);
+            user.setStatus(1);
+//            String dateString = LocalDate.now().toString();
+//            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//            Date date = format.parse(dateString);
+//            user.setCreatedAt(date);
             _userRepository.save(user);
             response.sendRedirect("http://localhost:3000/successful");
         }else{

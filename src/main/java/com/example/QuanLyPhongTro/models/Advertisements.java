@@ -12,6 +12,7 @@ public class Advertisements {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+	@Column(columnDefinition = "LONGTEXT")
     private String description;
 
     private Integer status;
