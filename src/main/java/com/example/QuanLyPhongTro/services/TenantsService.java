@@ -53,4 +53,8 @@ public class TenantsService {
         }
         return false;
     }
+
+    public List<Tenants> getTenantsByRoomId(int roomId) {
+        return _tenantsRepository.findByRoomId(roomId); // Gọi đến phương thức trong repository
+    }
 }
