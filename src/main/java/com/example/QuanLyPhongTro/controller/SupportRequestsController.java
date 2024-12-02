@@ -1,5 +1,6 @@
 package com.example.QuanLyPhongTro.controller;
 
+import com.example.QuanLyPhongTro.models.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -85,5 +86,15 @@ public class SupportRequestsController {
                 .stream()
                 .filter(request -> request.getUser().getId() == userId)
                 .toList();
+    }
+
+    // Lấy thông tin user của request
+    @GetMapping("/{supportRequestId}/user")
+    public ResponseEntity<Users> getUserBySupportRequestId(@PathVariable Integer supportRequestId) {
+        Users user = _supportRequestsService.getUserBySupportRequestId(supportRequestId);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build(); // Trả về 404 nếu không tìm thấy
     }
 }

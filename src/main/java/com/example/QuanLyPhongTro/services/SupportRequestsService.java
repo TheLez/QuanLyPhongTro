@@ -1,5 +1,6 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.example.QuanLyPhongTro.models.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,7 @@ public class SupportRequestsService {
             supportRequest.setStatus(supportRequestDetails.getStatus());
             supportRequest.setContent(supportRequestDetails.getContent());
             supportRequest.setUser(supportRequestDetails.getUser());
+            supportRequest.setAdminReply(supportRequestDetails.getAdminReply());
             return _supportRequestsRepository.save(supportRequest);
         }
         return null;
@@ -54,6 +56,7 @@ public class SupportRequestsService {
         }
         return false;
     }
+
     // Lấy tất cả request chưa reply
     public List<SupportRequests> getPendingRequests() {
         return _supportRequestsRepository.findByStatus(0); // 0: Pending
@@ -86,5 +89,17 @@ public class SupportRequestsService {
             // Nếu không parse được, trả về chuỗi gốc
             return json;
         }
+    }
+
+    public List<SupportRequests> getSupportRequestsByUserId(Integer userId) {
+        return _supportRequestsRepository.findByUserId(userId);
+    }
+
+    public Users getUserBySupportRequestId(Integer supportRequestId) {
+        SupportRequests request = _supportRequestsRepository.findById(supportRequestId).orElse(null);
+        if (request != null) {
+            return request.getUser(); // Trả về thông tin người dùng từ yêu cầu hỗ trợ
+        }
+        return null; // Nếu không tìm thấy yêu cầu hỗ trợ
     }
 }

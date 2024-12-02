@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SupportRequestsRepository extends JpaRepository<SupportRequests, Integer> {
     List<SupportRequests> findByStatus(Integer status); // Lấy danh sách request theo trạng thái
+    List<SupportRequests> findByUserId(Integer userId);
 }
