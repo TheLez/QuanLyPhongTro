@@ -92,7 +92,7 @@ public class InvoicesController {
         }
 
         Invoices invoice = _invoicesService.createInvoice(request.getTotal(), room); // Tạo hóa đơn
-        String paymentLink = createPaymentLink(invoice, req); // Tạo link thanh toán
+        String paymentLink = createPaymentLink(invoice, request, req); // Tạo link thanh toán
 
         // Tạo thông điệp gửi tới người dùng
         String message = request.getMessage() + "\nVui lòng thanh toán hóa đơn của bạn tại: " + paymentLink;
@@ -101,45 +101,84 @@ public class InvoicesController {
         return ResponseEntity.ok("Hóa đơn đã được tạo và gửi đến email của bạn.");
     }
 
-    private String createPaymentLink(Invoices invoice, HttpServletRequest req) {
-        long amount = (long)(invoice.getTotal() * 100); // Chuyển đổi sang đơn vị tiền tệ (VND)
+    private String createPaymentLink(Invoices invoice, InvoiceRequest request, HttpServletRequest req) {
+        long amount = (long)(request.getTotal() * 100); // Chuyển đổi sang đơn vị tiền tệ (VND)
+        String bankCode = req.getParameter("bankCode"); // Nhập ngân hàng muốn chuyển vào
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8); // Tạo số tham chiếu giao dịch
         String vnp_IpAddr = VNPayConfig.getIpAddress(req); // Địa chỉ IP của người dùng
-        String vnp_OrderInfo = Base64.getEncoder().encodeToString((invoice.getId() + "").getBytes()); // Thông tin đơn hàng
+        String vnp_TmnCode = VNPayConfig.vnp_TmnCode; // Mã đối tác
 
         // Thiết lập các tham số cần thiết
         Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", "2.1.0"); // Phiên bản API VNPay
-        vnp_Params.put("vnp_Command", "pay"); // Lệnh thanh toán
-        vnp_Params.put("vnp_TmnCode", VNPayConfig.vnp_TmnCode); // Mã đối tác
+        vnp_Params.put("vnp_Version", VNPayConfig.vnp_Version);
+        vnp_Params.put("vnp_Command", VNPayConfig.vnp_Command);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(amount)); // Số tiền
-        vnp_Params.put("vnp_CurrCode", "VND"); // Đơn vị tiền tệ
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef); // Số tham chiếu giao dịch
-        vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo); // Thông tin đơn hàng
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl); // URL trả về sau khi thanh toán
-        vnp_Params.put("vnp_IpAddr", vnp_IpAddr); // Địa chỉ IP của người dùng
+        vnp_Params.put("vnp_CurrCode", "VND");
 
-        // Tạo thời gian tạo và thời gian hết hạn (nếu cần)
+        if (bankCode != null && !bankCode.isEmpty()) {
+            vnp_Params.put("vnp_BankCode", bankCode);
+        } else {
+            vnp_Params.put("vnp_BankCode", "NCB");
+        }
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        // Thông tin đơn hàng
+        String orderInfo = String.format("%s|%s|%s|%s",
+                request.getTotal(),
+                request.getMessage(),
+                request.getRoomId(),
+                request.getEmail());
+        vnp_Params.put("vnp_OrderInfo", Base64.getEncoder().encodeToString(orderInfo.getBytes()));
+        vnp_Params.put("vnp_OrderType", VNPayConfig.orderType); // Loại đơn hàng
+
+        // Ngôn ngữ
+        String locate = req.getParameter("language");
+        vnp_Params.put("vnp_Locale", (locate != null && !locate.isEmpty()) ? locate : "vn");
+
+        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+        // Thời gian tạo
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(new Date());
+        String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        // Tạo chuỗi hash cho bảo mật
-        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        // Thời gian hết hạn (nếu cần)
+        cld.add(Calendar.MINUTE, 15);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+        // Tạo chuỗi hash và URL
+        List fieldNames = new ArrayList(vnp_Params.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
-
-        for (String fieldName : fieldNames) {
-            String fieldValue = vnp_Params.get(fieldName);
-            if (fieldValue != null && fieldValue.length() > 0) {
-                hashData.append(fieldName).append("=").append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                hashData.append("&");
+        StringBuilder query = new StringBuilder();
+        Iterator itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                //Build hash data
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
             }
         }
+        String queryUrl = query.toString();
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
-        String queryUrl = VNPayConfig.vnp_PayUrl + "?" + hashData.toString() + "vnp_SecureHash=" + vnp_SecureHash;
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
 
-        return queryUrl; // Trả về URL thanh toán đầy đủ
+        return paymentUrl; // Trả về URL thanh toán đầy đủ
     }
 
     @GetMapping("/payment_infor")
