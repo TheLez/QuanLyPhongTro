@@ -1,5 +1,6 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import com.example.QuanLyPhongTro.models.SupportRequests;
 import com.example.QuanLyPhongTro.repositories.SupportRequestsRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SupportRequestsService {
@@ -61,10 +63,28 @@ public class SupportRequestsService {
     public SupportRequests replyToRequest(int id, String replyContent) {
         SupportRequests request = _supportRequestsRepository.findById(id).orElse(null);
         if (request != null && request.getStatus() == 0) { // Chỉ reply nếu chưa được trả lời
+            // Đảm bảo replyContent là một chuỗi đơn giản
+            if (replyContent.startsWith("{") && replyContent.endsWith("}")) {
+                // Nếu replyContent là JSON, chỉ lấy phần giá trị bên trong
+                replyContent = extractStringFromJson(replyContent);
+            }
             request.setAdminReply(replyContent);
             request.setStatus(1); // Cập nhật trạng thái thành Replied
             return _supportRequestsRepository.save(request);
         }
         return null; // Không tìm thấy hoặc request đã được trả lời
+    }
+
+    // Phương thức để trích xuất chuỗi từ JSON
+    private String extractStringFromJson(String json) {
+        try {
+            // Sử dụng thư viện Jackson hoặc Gson để parse JSON
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> map = mapper.readValue(json, Map.class);
+            return map.get("reply"); // Lấy giá trị của key "reply"
+        } catch (Exception e) {
+            // Nếu không parse được, trả về chuỗi gốc
+            return json;
+        }
     }
 }
