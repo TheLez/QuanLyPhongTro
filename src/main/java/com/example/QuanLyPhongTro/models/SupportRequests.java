@@ -1,4 +1,5 @@
 package com.example.QuanLyPhongTro.models;
+
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -6,21 +7,24 @@ import java.util.Date;
 @Table(name = "Support_Requests")
 public class SupportRequests {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
+	@Temporal(TemporalType.DATE)
+	private Date createdAt;
 
-    private Integer status;
+	private Integer status; // 0: Pending, 1: Replied (admin đã trả lời)
 
-    private String content;
+	private String content; // Nội dung yêu cầu từ user
 
-    @ManyToOne
-    @JoinColumn(name = "id_user")
-    private Users user;
+	private String adminReply; // Nội dung trả lời từ admin
 
+	@ManyToOne
+	@JoinColumn(name = "id_user")
+	private Users user;
+
+	// Getters và Setters
 	public Integer getId() {
 		return id;
 	}
@@ -53,6 +57,14 @@ public class SupportRequests {
 		this.content = content;
 	}
 
+	public String getAdminReply() {
+		return adminReply;
+	}
+
+	public void setAdminReply(String adminReply) {
+		this.adminReply = adminReply;
+	}
+
 	public Users getUser() {
 		return user;
 	}
@@ -60,7 +72,4 @@ public class SupportRequests {
 	public void setUser(Users user) {
 		this.user = user;
 	}
-
-    // Getters and Setters
-    
 }

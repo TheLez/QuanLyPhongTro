@@ -1,5 +1,7 @@
 package com.example.QuanLyPhongTro.services;
 
+import com.example.QuanLyPhongTro.models.Users;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +12,7 @@ import com.example.QuanLyPhongTro.models.SupportRequests;
 import com.example.QuanLyPhongTro.repositories.SupportRequestsRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SupportRequestsService {
@@ -40,6 +43,7 @@ public class SupportRequestsService {
             supportRequest.setStatus(supportRequestDetails.getStatus());
             supportRequest.setContent(supportRequestDetails.getContent());
             supportRequest.setUser(supportRequestDetails.getUser());
+            supportRequest.setAdminReply(supportRequestDetails.getAdminReply());
             return _supportRequestsRepository.save(supportRequest);
         }
         return null;
@@ -51,5 +55,51 @@ public class SupportRequestsService {
             return true;
         }
         return false;
+    }
+
+    // Lấy tất cả request chưa reply
+    public List<SupportRequests> getPendingRequests() {
+        return _supportRequestsRepository.findByStatus(0); // 0: Pending
+    }
+
+    // Admin trả lời request
+    public SupportRequests replyToRequest(int id, String replyContent) {
+        SupportRequests request = _supportRequestsRepository.findById(id).orElse(null);
+        if (request != null && request.getStatus() == 0) { // Chỉ reply nếu chưa được trả lời
+            // Đảm bảo replyContent là một chuỗi đơn giản
+            if (replyContent.startsWith("{") && replyContent.endsWith("}")) {
+                // Nếu replyContent là JSON, chỉ lấy phần giá trị bên trong
+                replyContent = extractStringFromJson(replyContent);
+            }
+            request.setAdminReply(replyContent);
+            request.setStatus(1); // Cập nhật trạng thái thành Replied
+            return _supportRequestsRepository.save(request);
+        }
+        return null; // Không tìm thấy hoặc request đã được trả lời
+    }
+
+    // Phương thức để trích xuất chuỗi từ JSON
+    private String extractStringFromJson(String json) {
+        try {
+            // Sử dụng thư viện Jackson hoặc Gson để parse JSON
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> map = mapper.readValue(json, Map.class);
+            return map.get("reply"); // Lấy giá trị của key "reply"
+        } catch (Exception e) {
+            // Nếu không parse được, trả về chuỗi gốc
+            return json;
+        }
+    }
+
+    public List<SupportRequests> getSupportRequestsByUserId(Integer userId) {
+        return _supportRequestsRepository.findByUserId(userId);
+    }
+
+    public Users getUserBySupportRequestId(Integer supportRequestId) {
+        SupportRequests request = _supportRequestsRepository.findById(supportRequestId).orElse(null);
+        if (request != null) {
+            return request.getUser(); // Trả về thông tin người dùng từ yêu cầu hỗ trợ
+        }
+        return null; // Nếu không tìm thấy yêu cầu hỗ trợ
     }
 }

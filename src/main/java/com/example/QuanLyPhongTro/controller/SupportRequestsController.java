@@ -1,5 +1,6 @@
 package com.example.QuanLyPhongTro.controller;
 
+import com.example.QuanLyPhongTro.models.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +65,36 @@ public class SupportRequestsController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    //Phuc test
+    // Lấy danh sách request chưa được trả lời (cho admin)
+    @GetMapping("/pending")
+    public List<SupportRequests> getPendingRequests() {
+        return _supportRequestsService.getPendingRequests();
+    }
+
+    // Admin trả lời request
+    @PostMapping("/{id}/reply")
+    public SupportRequests replyToRequest(@PathVariable int id, @RequestBody String replyContent) {
+        return _supportRequestsService.replyToRequest(id, replyContent);
+    }
+
+    // User lấy tất cả các request của họ
+    @GetMapping("/user/{userId}")
+    public List<SupportRequests> getUserRequests(@PathVariable int userId) {
+        return _supportRequestsService.getAllSupportRequests() // Hoặc thêm filter ở đây
+                .stream()
+                .filter(request -> request.getUser().getId() == userId)
+                .toList();
+    }
+
+    // Lấy thông tin user của request
+    @GetMapping("/{supportRequestId}/user")
+    public ResponseEntity<Users> getUserBySupportRequestId(@PathVariable Integer supportRequestId) {
+        Users user = _supportRequestsService.getUserBySupportRequestId(supportRequestId);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build(); // Trả về 404 nếu không tìm thấy
     }
 }
