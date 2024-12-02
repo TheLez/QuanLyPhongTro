@@ -38,6 +38,20 @@ public class UsersController {
         return ResponseEntity.notFound().build();
     }
 
+
+
+    // Lấy người dùng theo ID
+    @GetMapping("/get-by-name")
+    public ResponseEntity<String> getUserById(@RequestParam("username") String username) {
+        Users user = _usersRepository.findByUsername(username);
+        if (user != null) {
+            return ResponseEntity.ok("Đã tồn tại");
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+
     // Lấy danh sách người dùng với phân trang
     @GetMapping("")  // Giữ nguyên để trả về danh sách người dùng với phân trang
     public Page<Users> getUsers(
