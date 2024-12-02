@@ -1,6 +1,8 @@
 package com.example.QuanLyPhongTro.controller;
 
 import com.example.QuanLyPhongTro.models.Users;
+import com.example.QuanLyPhongTro.repositories.SupportRequestsRepository;
+import com.example.QuanLyPhongTro.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class SupportRequestsController {
 
     @Autowired
     private SupportRequestsService _supportRequestsService;
+    @Autowired
+    private SupportRequestsRepository _supportRequestRepository;
 
     // Lấy tất cả các yêu cầu hỗ trợ
     @GetMapping("/all")  // Thay đổi đường dẫn để tránh xung đột
@@ -96,5 +100,15 @@ public class SupportRequestsController {
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.notFound().build(); // Trả về 404 nếu không tìm thấy
+    }
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<SupportRequests> changeUserStatus(@PathVariable int id, @RequestBody SupportRequests supportRequests) {
+        SupportRequests updateSupportRequests = _supportRequestRepository.findById(id).orElse(null);
+        if (updateSupportRequests != null) {
+            updateSupportRequests.setStatus(supportRequests.getStatus());
+            _supportRequestRepository.save(updateSupportRequests);
+            return ResponseEntity.ok(supportRequests);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
