@@ -6,6 +6,7 @@ import com.example.QuanLyPhongTro.payload.InvoiceRequest;
 import com.example.QuanLyPhongTro.services.EmailService;
 import com.example.QuanLyPhongTro.services.RoomsService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,7 @@ public class InvoicesController {
         }
 
         Invoices invoice = _invoicesService.createInvoice(request.getTotal(), room); // Tạo hóa đơn
+
         String paymentLink = createPaymentLink(invoice, request, req); // Tạo link thanh toán
 
         // Tạo thông điệp gửi tới người dùng
@@ -102,6 +104,7 @@ public class InvoicesController {
     }
 
     private String createPaymentLink(Invoices invoice, InvoiceRequest request, HttpServletRequest req) {
+        System.out.println(invoice.getId());
         long amount = (long)(request.getTotal() * 100); // Chuyển đổi sang đơn vị tiền tệ (VND)
         String bankCode = req.getParameter("bankCode"); // Nhập ngân hàng muốn chuyển vào
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8); // Tạo số tham chiếu giao dịch
@@ -123,7 +126,8 @@ public class InvoicesController {
         }
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         // Thông tin đơn hàng
-        String orderInfo = String.format("%s|%s|%s|%s",
+        String orderInfo = String.format("%s|%s|%s|%s|%s",
+                invoice.getId(),
                 request.getTotal(),
                 request.getMessage(),
                 request.getRoomId(),
@@ -135,7 +139,7 @@ public class InvoicesController {
         String locate = req.getParameter("language");
         vnp_Params.put("vnp_Locale", (locate != null && !locate.isEmpty()) ? locate : "vn");
 
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", "http://localhost:8080/invoices/payment_infor");
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         // Thời gian tạo
@@ -184,29 +188,51 @@ public class InvoicesController {
     @GetMapping("/payment_infor")
     public ResponseEntity<?> transaction(
             HttpServletRequest request,
-            @RequestParam(value = "vnp_TxnRef") String txnRef,
-            @RequestParam(value = "vnp_ResponseCode") String responseCode,
-            @RequestParam(value = "vnp_Amount") String amount,
-            @RequestParam(value = "vnp_OrderInfo") String orderInfo
+            @RequestParam(value = "vnp_OrderInfo") String order,
+            @RequestParam(value = "vnp_ResponseCode") String responseCode
     ) {
-        // Giải mã thông tin đơn hàng
-        String decodedOrderInfo = new String(Base64.getDecoder().decode(orderInfo));
-        // Tách thông tin cần thiết
-        String[] orderDetails = decodedOrderInfo.split("\\|");
-        int invoiceId = Integer.parseInt(orderDetails[0]); // Lấy ID hóa đơn từ thông tin
+        try {
+            System.out.println("Received Order Info: " + order); // Log giá trị nhận được
+            System.out.println("Received Response Code: " + responseCode); // Log mã phản hồi
 
-        // Kiểm tra mã phản hồi
-        if ("00".equals(responseCode)) {
-            // Thanh toán thành công, cập nhật trạng thái hóa đơn
-            Invoices invoice = _invoicesService.getInvoiceById(invoiceId);
-            if (invoice != null) {
-                invoice.setStatus(1); // 1: đã thanh toán
-                _invoicesService.updateInvoice(invoice); // Cập nhật hóa đơn
+            // Giải mã thông tin đơn hàng
+            String decodedOrderInfo = new String(Base64.getDecoder().decode(order));
+            System.out.println("Decoded Order Info: " + decodedOrderInfo); // Kiểm tra giá trị đã giải mã
+
+            // Tách thông tin cần thiết
+            String[] orderDetails = decodedOrderInfo.split("\\|");
+            System.out.println("Order Details Length: " + orderDetails.length); // Kiểm tra số lượng phần tử
+
+            if (orderDetails.length > 0) {
+                try {
+                    int invoiceId = Integer.parseInt(orderDetails[0]); // Lấy ID hóa đơn từ thông tin
+                    System.out.println("Invoice ID: " + invoiceId); // Kiểm tra ID hóa đơn
+
+                    // Kiểm tra mã phản hồi
+                    if ("00".equals(responseCode)) {
+                        // Thanh toán thành công, cập nhật trạng thái hóa đơn
+                        Invoices invoice = _invoicesService.getInvoiceById(invoiceId);
+                        if (invoice != null) {
+                            invoice.setStatus(1); // 1: đã thanh toán
+                            _invoicesService.updateInvoice(invoice); // Cập nhật hóa đơn
+                            return ResponseEntity.status(HttpStatus.OK).body("Thanh toán thành công!");
+                        } else {
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Hóa đơn không tồn tại!");
+                        }
+                    } else {
+                        // Thanh toán không thành công
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Thanh toán không thành công!");
+                    }
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID hóa đơn không hợp lệ!");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Thông tin đơn hàng không hợp lệ!");
             }
-            return ResponseEntity.status(HttpStatus.OK).body("Thanh toán thành công!");
-        } else {
-            // Thanh toán không thành công
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Thanh toán không thành công!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Thông tin đơn hàng không hợp lệ!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi: " + e.getMessage());
         }
     }
 }
