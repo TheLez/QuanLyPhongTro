@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         // Kiểm tra xem user có tồn tại trong database không?
         Users user = userRepository.findByUsername(username);
-        if (user != null) {
+        if (user != null && user.getStatus()!=0) {
             return new CustomUserDetails(user);
         }
 
