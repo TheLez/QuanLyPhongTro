@@ -37,11 +37,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                                .anyRequest().permitAll()
-//                                .requestMatchers("/api/login").permitAll()
-//                                .requestMatchers("/api/signup").permitAll()
-//                                .requestMatchers("/advertisements/get").permitAll()
-//                                .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
+                                .requestMatchers("/api/login").permitAll()
+                                .requestMatchers("/api/signup").permitAll()
+                                .requestMatchers("/advertisements/get/**").permitAll()
+                                .requestMatchers("users/get-by-name").permitAll()
+                                .requestMatchers("/payment/**").permitAll()
+                                .requestMatchers("/service-packages/all").permitAll()
+                                .anyRequest().authenticated()
+
 //                        .requestMatchers(HttpMethod.DELETE, "/categories",
 //                                "/typeOfQuestions",
 //                                "/questions",
