@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 .requestMatchers("users/get-by-name").permitAll()
                                 .requestMatchers("/payment/**").permitAll()
                                 .requestMatchers("/service-packages/all").permitAll()
+                                .requestMatchers("/invoices/payment_infor").permitAll()
+                                .requestMatchers("/support-requests/**").permitAll()
                                 .anyRequest().authenticated()
 
 //                        .requestMatchers(HttpMethod.DELETE, "/categories",

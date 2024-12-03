@@ -71,4 +71,10 @@ public class TenantsController {
         List<Tenants> tenants = _tenantsService.getTenantsByRoomId(roomId);
         return ResponseEntity.ok(tenants);
     }
+
+    @GetMapping("/count/{roomId}")
+    public ResponseEntity<Integer> getTenantCountByRoomId(@PathVariable int roomId) {
+        int count = _tenantsService.getTenantsByRoomId(roomId).size();
+        return ResponseEntity.ok(count);
+    }
 }
