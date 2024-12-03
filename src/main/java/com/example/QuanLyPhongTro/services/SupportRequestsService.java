@@ -1,18 +1,26 @@
 package com.example.QuanLyPhongTro.services;
 
-import com.example.QuanLyPhongTro.models.Users;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.QuanLyPhongTro.dto.SupportRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.QuanLyPhongTro.models.SupportRequests;
 import com.example.QuanLyPhongTro.repositories.SupportRequestsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.example.QuanLyPhongTro.models.Users;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+import jakarta.persistence.criteria.Predicate;
+
 
 @Service
 public class SupportRequestsService {
@@ -101,5 +109,23 @@ public class SupportRequestsService {
             return request.getUser(); // Trả về thông tin người dùng từ yêu cầu hỗ trợ
         }
         return null; // Nếu không tìm thấy yêu cầu hỗ trợ
+    }
+    public Page<SupportRequestDTO> getSupportRequestByAmin(PageRequest pageRequest){
+        Specification<SupportRequests> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>(
+
+            );
+
+
+            predicates.add(criteriaBuilder.equal(root.get("status"), 0));
+
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        // Trả về kết quả phân trang
+        Page<SupportRequests> supportRequestsPage = _supportRequestsRepository.findAll(spec, pageRequest);
+
+        // Chuyển đối tượng Advertisement thành AdvertisementDTO
+        return supportRequestsPage.map(supportRequests -> new SupportRequestDTO(supportRequests));
     }
 }

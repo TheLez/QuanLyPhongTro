@@ -1,10 +1,14 @@
 package com.example.QuanLyPhongTro.controller;
 
+import com.example.QuanLyPhongTro.dto.AdvertisementDTO;
+import com.example.QuanLyPhongTro.dto.PageDTO;
+import com.example.QuanLyPhongTro.dto.SupportRequestDTO;
 import com.example.QuanLyPhongTro.models.Users;
 import com.example.QuanLyPhongTro.repositories.SupportRequestsRepository;
 import com.example.QuanLyPhongTro.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,5 +114,25 @@ public class SupportRequestsController {
             return ResponseEntity.ok(supportRequests);
         }
         return ResponseEntity.notFound().build();
+    }
+    @PutMapping("/change-reply/{id}")
+    public ResponseEntity<SupportRequests> changeAdminReply(@PathVariable int id, @RequestBody SupportRequests supportRequests) {
+        SupportRequests updateSupportRequests = _supportRequestRepository.findById(id).orElse(null);
+        if (updateSupportRequests != null) {
+            updateSupportRequests.setAdminReply(supportRequests.getAdminReply());
+            _supportRequestRepository.save(updateSupportRequests);
+            return ResponseEntity.ok(supportRequests);
+        }
+        return ResponseEntity.notFound().build();
+    }
+    @GetMapping("/admin/get")
+    public ResponseEntity<PageDTO<SupportRequestDTO>> getAdvertisementsByAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        // Gọi service với các tham số lọc
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<SupportRequestDTO> supportrequest = _supportRequestsService.getSupportRequestByAmin(pageRequest);
+
+        return ResponseEntity.ok(new PageDTO<SupportRequestDTO>(supportrequest));
     }
 }
