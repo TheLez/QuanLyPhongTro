@@ -65,4 +65,13 @@ public class HousesController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Houses>> getHousesByUserId(@PathVariable int userId) {
+        List<Houses> houses = _housesService.getHousesByUserId(userId);
+        if (houses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(houses);
+    }
 }
