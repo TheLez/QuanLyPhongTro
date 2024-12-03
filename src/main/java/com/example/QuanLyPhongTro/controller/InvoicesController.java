@@ -97,7 +97,7 @@ public class InvoicesController {
         String paymentLink = createPaymentLink(invoice, request, req); // Tạo link thanh toán
 
         // Tạo thông điệp gửi tới người dùng
-        String message = request.getMessage() + "\nVui lòng thanh toán hóa đơn của bạn tại: " + paymentLink;
+        String message = request.getMessage() + "\nVui long thanh toan hoa don cua ban tai: " + paymentLink;
         emailService.sendEmail(request.getEmail(), "Hóa Đơn Thanh Toán", message); // Gửi email
 
         return ResponseEntity.ok("Hóa đơn đã được tạo và gửi đến email của bạn.");
