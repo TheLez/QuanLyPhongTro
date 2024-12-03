@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TenantsRepository extends JpaRepository<Tenants, Integer> {
     List<Tenants> findByRoomId(int roomId);
+    List<Tenants> findByRoom_House_Id(int houseId);
 }

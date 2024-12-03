@@ -57,4 +57,8 @@ public class TenantsService {
     public List<Tenants> getTenantsByRoomId(int roomId) {
         return _tenantsRepository.findByRoomId(roomId); // Gọi đến phương thức trong repository
     }
+
+    public List<Tenants> getTenantsByHouseId(int houseId) {
+        return _tenantsRepository.findByRoom_House_Id(houseId); // Gọi đến phương thức trong repository
+    }
 }
