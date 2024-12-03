@@ -1,9 +1,11 @@
 package com.example.QuanLyPhongTro.config;
 
 import com.example.QuanLyPhongTro.services.CustomUserDetailsService;
+import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -45,7 +47,6 @@ public class SecurityConfig {
                                 .requestMatchers("/payment/**").permitAll()
                                 .requestMatchers("/service-packages/all").permitAll()
                                 .requestMatchers("/invoices/payment_infor").permitAll()
-                                .requestMatchers("/support-requests/**").permitAll()
                                 .anyRequest().authenticated()
 
 //                        .requestMatchers(HttpMethod.DELETE, "/categories",
