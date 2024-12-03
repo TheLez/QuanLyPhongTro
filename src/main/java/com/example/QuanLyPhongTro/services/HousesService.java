@@ -55,4 +55,8 @@ public class HousesService {
         }
         return false;
     }
+
+    public List<Houses> getHousesByUserId(int userId) {
+        return _housesRepository.findByUserId(userId); // Gọi phương thức trong Repository
+    }
 }
